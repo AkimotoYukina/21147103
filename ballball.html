@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>接球游戏</title>
+        <style>
+            #board1,
+            #board2,
+            #board3,
+            #board4 {
+                position: absolute;
+                width: 80px;
+                height: 10px;
+                top: 555px;
+                background-color:rgb(185, 185, 185);
+            }
+
+            #board1 {
+                left: 420px;
+            }
+
+            #board2 {
+                left: 520px;
+            }
+
+            #board3 {
+                left: 620px;
+            }
+
+            #board4 {
+                left: 720px;
+            }
+
+            #ball {
+                width: 20px;
+                height: 20px;
+                background-color:red;
+                border-radius: 50%;
+                position: absolute;
+                left: 600px;
+                top: 100px;
+            }
+
+            #box {
+                border: 5px solid black;
+                width: 400px;
+                height: 550px;
+            }
+
+            #gg {
+                width: 200px;
+                height: 10px;
+                position: absolute;
+                left: 550px;
+                top: 200px;
+                font-size: 30px;
+                display: none;
+            }
+            .refresh-btn {
+                padding: 10px 20px;
+                background-color: #337ab7;
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    
+    <body>
+        
+        <div id="board1"></div>
+        <div id="board2"></div>
+        <div id="board3"></div>
+        <div id="board4"></div>
+        <div id="ball"></div>
+        <div id="box"></div>
+        <div id="gg">游戏结束</div>
+        <button class="refresh-btn">重新开始</button>
+
+        <script>
+            var box = document.getElementById("box");
+            box.style.position = "absolute";
+            box.style.left = "400px";
+            var board1 = document.getElementById("board1");
+            var board2 = document.getElementById("board2");
+            var board3 = document.getElementById("board3");
+            var board4 = document.getElementById("board4");
+            
+            var ball = document.getElementById("ball");
+            document.onkeydown = f;
+            function f(e){
+                var e = e || window.event;
+                switch(e.keyCode){
+                    case 37:
+                        if(ball.offsetLeft>=box.offsetLeft + 10)
+                            ball.style.left = ball.offsetLeft - 8 + "px";
+                        break;
+                    case 39:
+                        if(ball.offsetLeft<=box.offsetLeft+box.offsetWidth-ball.offsetWidth-10)
+                            ball.style.left = ball.offsetLeft + 8 + "px";
+                        break;
+                }
+            }
+            
+            function moveBoard(board)
+            {
+                var t1 = board.offsetTop;
+                if(t1<=0)
+                {
+                    t2 = Math.floor(Math.random() * (720- 420) + 420);
+                    board.style.left = t2 + "px";
+                    board.style.top = "555px";
+                }
+                else
+                    board.style.top = board.offsetTop - 1 + "px";
+            }
+
+            var startSpeed = 1;
+            var ballSpeed =startSpeed;
+
+            function step()
+            {
+                var t1 = Math.abs(board1.offsetTop - board2.offsetTop);
+                var t2 = Math.abs(board2.offsetTop - board3.offsetTop);
+                var t3 = Math.abs(board3.offsetTop - board4.offsetTop);
+                var t4 = 140;
+                if(t1<t4)
+                {
+                    moveBoard(board1);
+                }
+                else if(t2<t4)
+                {
+                    moveBoard(board1);
+                    moveBoard(board2);
+                }
+                else if(t3<t4)
+                {
+                    moveBoard(board1);
+                    moveBoard(board2);
+                    moveBoard(board3);
+                }
+                else
+                {
+                    moveBoard(board1);
+                    moveBoard(board2);
+                    moveBoard(board3);
+                    moveBoard(board4);
+                }
+
+                var t5 = Math.abs(ball.offsetTop - board1.offsetTop);
+                var t6 = Math.abs(ball.offsetTop - board2.offsetTop);
+                var t7 = Math.abs(ball.offsetTop - board3.offsetTop);
+                var t8 = Math.abs(ball.offsetTop - board4.offsetTop);
+                if(t5<=ball.offsetHeight && t5>0 && ball.offsetLeft>=board1.offsetLeft-ball.offsetWidth && ball.offsetLeft<=board1.offsetLeft+board1.offsetWidth)
+                {
+                    ball.style.top = board1.offsetTop - ball.offsetHeight + "px";
+                    ballSpeed = startSpeed;
+                }
+                else if(t6<=ball.offsetHeight && t6>0 && ball.offsetLeft>=board2.offsetLeft-ball.offsetWidth && ball.offsetLeft<=board2.offsetLeft+board2.offsetWidth)
+                {
+                    ball.style.top = board2.offsetTop - ball.offsetHeight + "px";
+                    ballSpeed = startSpeed;
+                }
+                else if(t7<=ball.offsetHeight && t7>0 && ball.offsetLeft>=board3.offsetLeft-ball.offsetWidth && ball.offsetLeft<=board3.offsetLeft+board3.offsetWidth)
+                {
+                    ball.style.top = board3.offsetTop - ball.offsetHeight + "px";
+                    ballSpeed = startSpeed;
+                }
+                else if(t8<=ball.offsetHeight && t8>0 && ball.offsetLeft>=board4.offsetLeft-ball.offsetWidth && ball.offsetLeft<=board4.offsetLeft+board4.offsetWidth)
+                {
+                    ball.style.top = board4.offsetTop - ball.offsetHeight + "px";
+                    ballSpeed = startSpeed;
+                }
+                else
+                {
+                    ballSpeed = ballSpeed + 0.01; 
+                    ball.style.top = ball.offsetTop + ballSpeed + "px";
+                }
+                
+                if(ball.offsetTop==0 || ball.offsetTop>=box.offsetTop+box.offsetHeight)
+                {
+                    clearInterval(gameover);
+                    ball.style.display = 'none';
+                    board1.style.display = 'none';
+                    board2.style.display = 'none';
+                    board3.style.display = 'none';
+                    board4.style.display = 'none';
+                    var gg = document.getElementById("gg");
+                    gg.style.display = 'block';
+                }
+            }
+
+            var gameover = setInterval("step();", 8);
+
+            document.querySelector('.refresh-btn').addEventListener('click', function() {
+                location.reload(); 
+            });
+
+        </script>
+    </body>
+</html>
